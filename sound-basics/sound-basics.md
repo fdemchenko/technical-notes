@@ -23,9 +23,9 @@ I'll give a piece of definition from [Wikipedia](https://en.wikipedia.org/wiki/D
 
 > Discretization is the process of transferring continuous functions, models, variables, and equations into discrete counterparts. This process is usually carried out as a first step toward making them suitable for numerical evaluation and implementation on digital computers.
 
-In the real world, sound is represented by continuous value, meaning data (amplitude of the wave at a given time for example) can take on any value within a given range. Between any two values, there is always another possible value (infinite decimal places).
+In the real world, sound is represented by continuous values, meaning data (amplitude of the wave at a given time for example) can take on any value within a given range. Between any two values, there is always another possible value (infinite decimal places).
 
-Imagine a stone falling down from a high hill; its motion is smooth, there are no discrete steps in the stone's velocity or coordinate.
+Imagine a stone falling down from a steep hill; its motion is smooth, there are no discrete steps in the stone's velocity or coordinate.
 
 Values that are measured and can be broken down into smaller and smaller fractions are called **continuous values**.
 
@@ -43,7 +43,7 @@ Imagine a microphone membrane moving together with some wave in the air. We cann
 
 ![Discretization](assets/discretization.png)
 
-We record samples at a given rate (8 kHz, 44100 Hz, etc). This is the first characteristic of the discrete sound data - sample rate. This is also called "horizontal resolution". It'll become clear later, why it is called horizontal and what vertical resolution is.
+We record samples at a given rate (8 kHz, 44100 Hz, etc). This is the first characteristic of the discrete sound data - sample rate. This is also called "horizontal resolution". It'll become clear later why it is called horizontal and what vertical resolution is.
 
 A bigger sample rate means we can record a sound wave more precisely and store more information. However, this leads to increased file sizes.
 
@@ -96,7 +96,7 @@ Generally speaking, PCM is the most fundamental way to encode analog sound into 
 However, PCM is not the most efficient way to store audio. Because it records every single sample - even during silence - it results in very large file sizes. To solve this, we use various compression formats:
 
 - FLAC is a lossless encoding of linear pulse-code modulation data
-- MP3, AAC are lossy formats that remove "unnecessary" data. Often, developers of such codecs use the imperfections of the humans ears
+- MP3, AAC are lossy formats that remove "unnecessary" data. Often, developers of such codecs use the imperfections of the human ears
 
 Those entities defined above are codecs (encoders/decoders) to manipulate binary data. However, how and where do we store this encoded data? Can encoded sound be interpreted without any additional information regarding its format? The answer is the following: we often need additional metadata (data that describes other data). Even for raw LPCM, the computer needs to know the Sample Rate, Bit Depth, and Number of Channels.
 
@@ -124,7 +124,7 @@ and then select the 16 bit signed PCM encoding
 
 or 
 
-```
+```bash
 ffmpeg -i input_file -c:a pcm_s16le output.wav
 ```
 
@@ -146,7 +146,7 @@ In its basic form, a WAV file is a RIFF container file with the following struct
 | 22 | 	NumChannels | 2 | Mono = 1, Stereo = 2
 | 24 | 	SampleRate | 4 | e.g., 44100
 | 28 | 	ByteRate | 4 | SampleRate * NumChannels * BitsPerSample/8 
-| 32 | 	BlockAlign | 2 | NumChannels * BitsPerSample/8 (how many bytes per sample, consindering number of channels)
+| 32 | 	BlockAlign | 2 | NumChannels * BitsPerSample/8 (how many bytes per sample, considering number of channels)
 | 34 | 	BitsPerSample | 2 | e.g., 16
 | 36 | 	Subchunk2ID | 4 | "data"
 | 40 | 	Subchunk2Size | 4 | Size of the raw sound data
@@ -186,16 +186,16 @@ print(f'File size - 8 bytes: {file_size}')
 print(f'Container format: {wav_format}')
 ```
 
-Get the characteitics of the sound:
+Get the characteristics of the sound:
 ```python
 WavFormatChunk = namedtuple('WavFormatChunk', [
-    'FormatBlocID',   # 4 bytes: "fmt "
-    'BlocSize',       # 4 bytes: Chunk size (usually 16)
+    'FormatBlockID',   # 4 bytes: "fmt "
+    'BlockSize',       # 4 bytes: Chunk size (usually 16)
     'AudioFormat',    # 2 bytes: 1 for PCM, 3 for Float
     'NbrChannels',    # 2 bytes: Number of channels
     'Frequency',      # 4 bytes: Sample rate (Hz)
-    'BytePerSec',     # 4 bytes: (Frequency * BytePerBloc)
-    'BytePerBloc',    # 2 bytes: (NbrChannels * BitsPerSample / 8)
+    'BytePerSec',     # 4 bytes: (Frequency * BytePerBlock)
+    'BytePerBlock',    # 2 bytes: (NbrChannels * BitsPerSample / 8)
     'BitsPerSample'   # 2 bytes: Bits per sample (e.g., 16, 24)
 ])
 
@@ -204,14 +204,14 @@ pcm_format_chunk = wav_file.read(24)
 raw_tuple = struct.unpack('<4sihhiihh', pcm_format_chunk)
 wav_format_chunk = WavFormatChunk(*raw_tuple)
 
-assert wav_format_chunk.FormatBlocID == b'fmt '
+assert wav_format_chunk.FormatBlockID == b'fmt '
 
 print(
-    f'PCM format chunk size: {wav_format_chunk.BlocSize}\n'
+    f'PCM format chunk size: {wav_format_chunk.BlockSize}\n'
     f'Audio format: {"PCM" if wav_format_chunk.AudioFormat == 1 else wav_format_chunk.AudioFormat}\n'
     f'Number of channels: {wav_format_chunk.NbrChannels}\n'
     f'Sample rate: {wav_format_chunk.Frequency}\n'
-    f'Bytes per sample: {wav_format_chunk.BytePerBloc}\n'
+    f'Bytes per sample: {wav_format_chunk.BytePerBlock}\n'
     f'Bytes per second: {wav_format_chunk.BytePerSec}\n'
     f'Bits per sample: {wav_format_chunk.BitsPerSample}\n'
 )
@@ -250,8 +250,7 @@ In our example, we have PCM encoded sound with 16 bits per sample, 44,100 sample
 ```
 
 Let's convert the first 10 samples into integers from raw bytes, just to see how this data looks like:
-```
-
+```python
 bytes_per_sample = wav_format_chunk.BitsPerSample // 8
 bytes_count = bytes_per_sample * 10 * wav_format_chunk.NbrChannels # How many bytes we should read to obtain first 10 samples
 
@@ -259,7 +258,7 @@ decoded_10_samples = [int.from_bytes(raw_data[i : i + bytes_per_sample], byteord
 ```
 
 Example output:
-```
+```python
 >>> decoded_10_samples
 [0, 0, 0, 0, -1, 0, 2, 1, -2, -2, 2, 2, -3, -2, 3, 2, -3, -1, 4, 0]
 
@@ -268,7 +267,7 @@ Which means that first 10 samples represents almost complete silence
 For signed 16-bit number we have range: [-32768 : 32767]
 ```
 
-Finally, let's pass our raw bytes directly to the sound card, without any headers or audio containers formats to check if we have done our work correctly (I use aplay, a binary player for the ALSA sound card driver, which should be available on most Linux distributions):
+Finally, let's pass our raw bytes directly to the sound card, without any headers or audio container formats to check if we have done our work correctly (I use aplay, a binary player for the ALSA sound card driver, which should be available on most Linux distributions):
 ```python
 process = subprocess.Popen(
     ['aplay', '-f', 'S16_LE', '-r', str(wav_format_chunk.Frequency), '-c', str(wav_format_chunk.NbrChannels), '-'],
