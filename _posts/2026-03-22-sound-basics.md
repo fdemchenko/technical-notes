@@ -1,18 +1,23 @@
+---
+layout: post
+title: Sound processing basics
+---
+
 # Demystifying sound processing. Basics
 
 ## It's all about waves and frequencies
 
 Basically, sound is just a wave that propagates in some environment. For example, our ears are able to detect such waves in the air and obtain some information from them. Let's look at the simplest sound shape, the sine curve.
 
-![Sinusoid](assets/sin.png)
+![Sinusoid]({{ site.baseurl }}/assets/sin.png)
 
 It's very unlikely, however, that you will face such ideal waves with only one sine component at a time in the real world. Let's now look at an example of an arbitrary sound wave that consists of many different frequencies and amplitudes.
 
-![Sound wave](assets/arbitrary_sound_wave.png)
+![Sound wave]({{ site.baseurl }}/assets/arbitrary_sound_wave.png)
 
 As you can see, it's much harder to observe any pattern here. I should say that in this waveform many different frequencies coexist at the same time. Their sum gives the mentioned picture. The bass guitar, the drums, and the singer’s voice all occupy different frequency ranges, yet they exist within the same space.
 
-![Combination](assets/combination.png)
+![Combination]({{ site.baseurl }}/assets/combination.png)
 
 > Looking at that complex waveform, it’s hard to observe any pattern. This is where the [Fourier Transform](https://en.wikipedia.org/wiki/Fourier_transform) comes in. It is a mathematical tool that allows us to decompose any complex wave into a sum of simple, perfect sine waves. Understanding that every sound is just a recipe of different frequencies is the foundation of modern audio processing, from equalizers to MP3 compression.
 
@@ -41,7 +46,7 @@ So, how do we do that? I'm going to explain the simplest method, called PCM (pul
 
 Imagine a microphone membrane moving together with some wave in the air. We cannot record the position of the membrane at all possible moments in time, but we can still record the position a fixed number of times per selected interval. For example: 8000 times per second, or 44100 times per second.
 
-![Discretization](assets/discretization.png)
+![Discretization]({{ site.baseurl }}/assets/discretization.png)
 
 We record samples at a given rate (8 kHz, 44100 Hz, etc). This is the first characteristic of the discrete sound data - sample rate. This is also called "horizontal resolution". It'll become clear later why it is called horizontal and what vertical resolution is.
 
@@ -61,7 +66,7 @@ Okay, now we record values with some fixed rate, but what kind of values do we r
 
 So, we have a range: [-4, -3, -2, -1, 0, 1, 2, 3]
 
-![Quantization](assets/quantization_3_bits.png)
+![Quantization]({{ site.baseurl }}/assets/quantization_3_bits.png)
 
 8 values, which can be represented by 3 bits (2 ** 3).
 
@@ -118,7 +123,7 @@ First of all, you need a **WAV file** with some arbitrary sound with **LPCM-enco
 
 You can download some music or sound and convert it using **Audacity** or **ffmpeg**:
 
-![Audacity export as WAV](assets/audacity_wav_export.png)
+![Audacity export as WAV]({{ site.baseurl }}/assets/audacity_wav_export.png)
 
 and then select the 16 bit signed PCM encoding 
 
