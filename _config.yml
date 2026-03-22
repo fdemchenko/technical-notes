@@ -2,3 +2,6 @@ url: "https://fdemchenko.github.io"
 baseurl: "/technical-notes"
 
 theme: jekyll-theme-cayman
+
+exclude:
+    - README.md
